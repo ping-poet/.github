@@ -1,0 +1,53 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "The one shared Renovate preset for every repo Dreamwright works in, on activescott and ping-poet. A repo extends it with \"github>ping-poet/.github\" and keeps its own packageRules in its renovate.json. Policy: Scott's 2026-11-07 decisions on ping-poet/dreamwright#748.",
+    "This repo is public on purpose: Mend's hosted app can't read a private preset from another account, so the old preset in ping-poet/dreamwright (private) never reached the activescott repos.",
+    "Based on activescott/tinkerbell's renovate.json, which has run since tinkerbell#184."
+  ],
+  "extends": ["config:recommended"],
+  "timezone": "America/Los_Angeles",
+  "minimumReleaseAge": "1 day",
+  "internalChecksFilter": "strict",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "rebaseWhen": "conflicted",
+  "semanticCommits": "enabled",
+  "separateMajorMinor": true,
+  "separateMultipleMajor": false,
+  "separateMinorPatch": false,
+  "vulnerabilityAlerts": {
+    "description": "Security updates open right away and skip the weekly schedule (Renovate's default). Renovate also sets minimumReleaseAge to null for them by default, so it is set again here: without it, a poisoned 'security' release would skip the 24 hours.",
+    "minimumReleaseAge": "1 day"
+  },
+  "packageRules": [
+    {
+      "description": "Every non-major update in the repo goes into one PR, opened on Mondays (Pacific) and auto-merged when CI is green. The window is all of Monday, not tinkerbell's old 'before 6am', because Renovate doesn't always run inside a narrow window. Renovate needs at least one passing check to automerge, so a repo without CI never automerges. The type is pinned to chore so a group that mixes dependencies and devDependencies gets one commit type.",
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-non-major",
+      "schedule": ["* * * * 1"],
+      "automerge": true,
+      "automergeType": "pr",
+      "prPriority": 5,
+      "semanticCommitType": "chore"
+    },
+    {
+      "description": "Each major opens as its own PR once it passes minimumReleaseAge. Not grouped, not auto-merged, and never held for Dependency Dashboard approval (Scott, 11-07: 'we'd just never see them').",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": false,
+      "automerge": false
+    },
+    {
+      "description": "Security fixes go first when prConcurrentLimit is reached. prPriority isn't allowed under vulnerabilityAlerts, so it is set here; matchJsonata on vulnerabilityFixVersion is how tinkerbell matches a vulnerability fix.",
+      "matchJsonata": ["$exists(vulnerabilityFixVersion)"],
+      "prPriority": 10
+    },
+    {
+      "description": "Packages that are used together get one PR for a major. activescott/auth#156 bumped only @simple-release/core to 3.x and left npm and github on 2.x, though scripts/release.ts uses all three. Minor and patch updates already come together in the weekly group. Families every repo shares go here; a repo's own families go in its renovate.json.",
+      "matchPackageNames": ["@simple-release/**"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "simple-release"
+    }
+  ]
+}
