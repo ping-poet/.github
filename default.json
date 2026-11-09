@@ -7,7 +7,7 @@
   ],
   "extends": ["config:recommended"],
   "timezone": "America/Los_Angeles",
-  "minimumReleaseAge": "1 day",
+  "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
@@ -17,8 +17,8 @@
   "separateMultipleMajor": false,
   "separateMinorPatch": false,
   "vulnerabilityAlerts": {
-    "description": "Security updates open right away and skip the weekly schedule (Renovate's default). Renovate also sets minimumReleaseAge to null for them by default, so it is set again here: without it, a poisoned 'security' release would skip the 24 hours.",
-    "minimumReleaseAge": "1 day"
+    "description": "Security updates open right away and skip the weekly schedule (Renovate's default). Renovate also sets minimumReleaseAge to null for them by default, so it is set again here: without it, a poisoned 'security' release would skip the 3 days.",
+    "minimumReleaseAge": "3 days"
   },
   "packageRules": [
     {
